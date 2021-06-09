@@ -48,11 +48,11 @@ jobs:
         shell: bash
       - name: Create argo namespace in k8s
         run: |
-          kubectl create ns argo --api-port host.k3d.internal:6443
+          kubectl create ns argo
         shell: bash
       - name: Install argo in k8s
         run: |
-          kubectl apply -n argo --wait=true -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml --api-port host.k3d.internal:6443
+          kubectl apply -n argo --wait=true -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
         shell: bash
       - name: Setup argo-cli
         run: |
@@ -74,11 +74,11 @@ jobs:
         shell: bash
       - name: Wait for argo
         run: |
-          kubectl rollout status deployment/argo-server -n argo --api-port host.k3d.internal:6443
+          kubectl rollout status deployment/argo-server -n argo
         shell: bash        
       - name: Get pods
         run: |
-          kubectl get pods --all-namespaces --api-port host.k3d.internal:6443
+          kubectl get pods --all-namespaces
         shell: bash        
       - name: Argo submit job
         run: |
