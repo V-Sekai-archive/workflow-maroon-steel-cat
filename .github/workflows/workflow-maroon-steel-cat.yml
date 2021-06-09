@@ -43,7 +43,7 @@ jobs:
         shell: bash
       - name: Move binary to path
         run: |
-          sudo mv ./kubectl /usr/local/bin/kubectl
+          mv ./kubectl /usr/local/bin/kubectl
         shell: bash
       - name: Get cluster info from kubectl
         run: |
@@ -69,7 +69,7 @@ jobs:
           chmod +x argo-linux-amd64
 
           # Move binary to path
-          sudo mv ./argo-linux-amd64 /usr/local/bin/argo
+          mv ./argo-linux-amd64 /usr/local/bin/argo
         shell: bash
       - name: Test installation
         run: |
