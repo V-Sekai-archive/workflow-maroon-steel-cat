@@ -32,17 +32,21 @@ jobs:
         run: |
           chmod +x kubectl
         shell: bash
+      - name: Move binary to path
+        run: |
+          mv ./kubectl /usr/local/bin/kubectl
+        shell: bash
       - name: Get cluster info from kubectl
         run: |
-          ./kubectl cluster-info
+          kubectl cluster-info
         shell: bash
       - name: Create argo namespace in k8s
         run: |
-          ./kubectl create ns argo
+          kubectl create ns argo
         shell: bash
       - name: Install argo in k8s
         run: |
-          ./kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
+          kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
         shell: bash
       - name: Setup argo-cli
         run: |
@@ -57,7 +61,6 @@ jobs:
 
           # Move binary to path
           mv ./argo-linux-amd64 /usr/local/bin/argo
-
         shell: bash
       - name: Test installation
         run: |
