@@ -86,7 +86,7 @@ jobs:
         shell: bash        
       - name: Wait for argo
         run: |
-          kubectl wait --for=condition=ready pod -l app=argo-server
+          kubectl rollout status deployment argo-server
         shell: bash        
       - name: Argo submit job
         run: |
