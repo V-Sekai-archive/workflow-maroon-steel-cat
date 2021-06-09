@@ -28,6 +28,18 @@ jobs:
       - name: Create k3d cluster
         run: |
           k3d cluster create --agents=3 --kubeconfig-switch-context
+        shell: bash        
+      - name: Curl get kubectl
+        run: |
+          curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
+        shell: bash
+      - name: Make executable kubectl 
+        run: |
+          chmod +x kubectl
+        shell: bash
+      - name: Move binary to path
+        run: |
+          mv ./kubectl /usr/local/bin/kubectl
         shell: bash
       - name: Kubectl config use-context 
         run: |
@@ -40,18 +52,6 @@ jobs:
       - name: Install helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-        shell: bash
-      - name: Curl get kubectl
-        run: |
-          curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
-        shell: bash
-      - name: Make executable kubectl 
-        run: |
-          chmod +x kubectl
-        shell: bash
-      - name: Move binary to path
-        run: |
-          mv ./kubectl /usr/local/bin/kubectl
         shell: bash
       - name: Get cluster info from kubectl
         run: |
