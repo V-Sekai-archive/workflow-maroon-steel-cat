@@ -6,9 +6,6 @@ spec:
   entrypoint: diamond
   templates:
   - name: sleep
-    inputs:
-      parameters:
-      - name: message
     container:
       image: fedora:34
       command: [sleep, "10"]
