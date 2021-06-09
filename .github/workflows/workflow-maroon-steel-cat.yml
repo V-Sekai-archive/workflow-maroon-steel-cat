@@ -52,7 +52,7 @@ jobs:
         shell: bash
       - name: Install argo in k8s
         run: |
-          kubectl apply -n argo --wait=true -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
+          kubectl apply -n argo --wait=true -f quick-start-postgres.yaml
         shell: bash
       - name: Setup argo-cli
         run: |
