@@ -36,3 +36,14 @@ jobs:
         run: |
           ./kubectl cluster-info
         shell: bash
+      - name: Create argo namespace in k8s
+        run: |
+          ./kubectl create ns argo
+        shell: bash
+      - name: Install argo in k8s
+        run: |
+          ./kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
+        shell: bash
+
+
+
