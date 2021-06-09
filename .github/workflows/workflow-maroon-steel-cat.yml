@@ -44,23 +44,19 @@ jobs:
       - name: Create k3d context
         run: |             
           kubectl config use-context k3d-k3s-default
-          kubectl cluster-info
+          kubectl cluster-info --api-port host.k3d.internal:6443
         shell: bash        
       - name: Install helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
         shell: bash
-      - name: Get cluster info from kubectl
-        run: |
-          kubectl cluster-info
-        shell: bash
       - name: Create argo namespace in k8s
         run: |
-          kubectl create ns argo
+          kubectl create ns argo --api-port host.k3d.internal:6443
         shell: bash
       - name: Install argo in k8s
         run: |
-          kubectl apply -n argo --wait=true -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml
+          kubectl apply -n argo --wait=true -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-postgres.yaml --api-port host.k3d.internal:6443
         shell: bash
       - name: Setup argo-cli
         run: |
@@ -82,11 +78,11 @@ jobs:
         shell: bash
       - name: Wait for argo
         run: |
-          kubectl rollout status deployment/argo-server -n argo
+          kubectl rollout status deployment/argo-server -n argo --api-port host.k3d.internal:6443
         shell: bash        
       - name: Get pods
         run: |
-          kubectl get pods --all-namespaces
+          kubectl get pods --all-namespaces --api-port host.k3d.internal:6443
         shell: bash        
       - name: Argo submit job
         run: |
