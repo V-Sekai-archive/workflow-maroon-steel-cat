@@ -7,8 +7,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
       
       - name: Get hostname
         run: |
           uname -a
         shell: bash
+
+      - uses: AbsaOSS/k3d-action@v1.4.0
+        name: "Create Single Cluster"
+        with:
+          cluster-name: "workflow-maroon-steel-cat-cluster-1"
+          args: --agents 1
