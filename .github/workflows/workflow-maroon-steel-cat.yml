@@ -20,7 +20,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create
+          k3d cluster create --agents=3
         shell: bash
       - name: Install helm
         run: |
