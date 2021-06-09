@@ -18,8 +18,12 @@ jobs:
           uname -a
         shell: bash
 
-      - uses: AbsaOSS/k3d-action@v1.4.0
-        name: "Create Single Cluster"
-        with:
-          cluster-name: "workflow-maroon-steel-cat-cluster-1"
-          args: --agents 1
+      - name: Install k3d
+        run: |
+          curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
+        shell: bash
+
+      - name: Create k3d cluster
+        run: |
+          k3d cluster create
+        shell: bash
