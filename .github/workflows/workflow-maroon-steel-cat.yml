@@ -26,20 +26,17 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
         shell: bash
+      - name: Install collium cli
+        run: |
+          curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
+          sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
+          sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
+          rm cilium-linux-amd64.tar.gz{,.sha256sum}
+        shell: bash
       - name: Install cillium
         run: |
-          helm repo add cilium https://helm.cilium.io/
-          helm install cilium cilium/cilium --version 1.8.3 \
-            --namespace kube-system \
-            --set global.nodeinit.enabled=true \
-            --set global.kubeProxyReplacement=partial \
-            --set global.hostServices.enabled=false \
-            --set global.externalIPs.enabled=true \
-            --set global.nodePort.enabled=true \
-            --set global.hostPort.enabled=true \
-            --set config.bpfMasquerade=false \
-            --set global.pullPolicy=IfNotPresent \
-            --set config.ipam=kubernetes
+          cilium install
+          cilium status --wait
         shell: bash
       - name: Curl get kubectl
         run: |
