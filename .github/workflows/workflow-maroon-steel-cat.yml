@@ -84,6 +84,10 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
         shell: bash        
+      - name: Wait for argo
+        run: |
+          kubectl wait --for=condition=ready pod -l app=argo-server
+        shell: bash        
       - name: Argo submit job
         run: |
           argo submit -n argo --log --wait https://raw.githubusercontent.com/argoproj/argo-workflows/master/examples/hello-world.yaml
