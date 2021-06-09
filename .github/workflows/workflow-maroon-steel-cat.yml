@@ -20,7 +20,6 @@ jobs:
           cluster-name: "maroon-steel-cat-cluster-1"          
           args:  >-
             --agents 3
-            --no-lb
       - name: Install helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash

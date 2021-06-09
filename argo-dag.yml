@@ -10,8 +10,8 @@ spec:
       parameters:
       - name: message
     container:
-      image: fedora:34
-      command: [echo, "{{inputs.parameters.message}}", "&&", "sleep 10"]
+      image: argoexec:dev-docker
+      command: [echo, "{{inputs.parameters.message}}"]
   - name: diamond
     dag:
       tasks:
