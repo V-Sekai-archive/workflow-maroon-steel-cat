@@ -20,7 +20,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create --k3s-server-arg="--flannel-backend=none" --volume /sys/fs/bpf:/sys/fs/bpf 
+          k3d cluster create --k3s-server-arg="--flannel-backend=none --no-deploy=traefik" --volume /sys/fs/bpf:/sys/fs/bpf 
         shell: bash
       - name: Install helm
         run: |
