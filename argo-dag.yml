@@ -5,32 +5,24 @@ metadata:
 spec:
   entrypoint: diamond
   templates:
-  - name: echo
+  - name: sleep
     inputs:
       parameters:
       - name: message
     container:
       image: fedora:34
-      command: [echo, "{{inputs.parameters.message}}"]
+      command: [sleep, "10"]
   - name: diamond
     dag:
       tasks:
       - name: A
-        template: echo
-        arguments:
-          parameters: [{name: message, value: A}]
+        template: sleep
       - name: B
         dependencies: [A]
-        template: echo
-        arguments:
-          parameters: [{name: message, value: B}]
+        template: sleep
       - name: C
         dependencies: [A]
-        template: echo
-        arguments:
-          parameters: [{name: message, value: C}]
+        template: sleep
       - name: D
         dependencies: [B, C]
-        template: echo
-        arguments:
-          parameters: [{name: message, value: D}]
+        template: sleep
