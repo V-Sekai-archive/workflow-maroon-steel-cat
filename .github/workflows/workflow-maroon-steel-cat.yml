@@ -27,7 +27,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create --agents=3
+          k3d cluster create --agents=3 --kubeconfig-switch-context
         shell: bash
       - name: Install helm
         run: |
