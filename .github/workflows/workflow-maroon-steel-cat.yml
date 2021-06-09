@@ -78,5 +78,5 @@ jobs:
         shell: bash        
       - name: Argo submit job
         run: |
-          argo submit -n argo --watch https://raw.githubusercontent.com/argoproj/argo-workflows/master/examples/hello-world.yaml
+          argo submit -n argo --watch argo-dag.yml
         shell: bash
