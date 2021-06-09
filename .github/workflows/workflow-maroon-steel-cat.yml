@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: 3.x
       
-      - name: Get hostname
+      - name: Get host
         run: |
           uname -a
         shell: bash
