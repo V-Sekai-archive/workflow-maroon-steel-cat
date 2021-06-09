@@ -28,7 +28,14 @@ jobs:
       - name: Create k3d cluster
         run: |
           k3d cluster create --agents=3 --kubeconfig-switch-context
+        shell: bash
+      - name: Kubectl config use-context 
+        run: |
           kubectl config use-context k3d-k3s-default
+        shell: bash
+      - name: Kubectl cluster-info
+        run: |
+          kubectl cluster-info
         shell: bash
       - name: Install helm
         run: |
