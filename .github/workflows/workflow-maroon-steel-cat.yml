@@ -18,7 +18,7 @@ jobs:
         shell: bash
       - name: Install apt software
         run: |
-          sudo apt install -y curl
+          apt install -y curl
         shell: bash
       - name: Install k3d
         run: |
