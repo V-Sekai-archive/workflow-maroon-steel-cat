@@ -14,11 +14,6 @@ jobs:
         run: |
           uname -a
         shell: bash
-      - name: Install apt software
-        run: |
-          apt-get update
-          apt-get install curl -y
-        shell: bash
       - name: Install k3d
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
