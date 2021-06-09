@@ -74,7 +74,7 @@ jobs:
         shell: bash        
       - name: Wait for argo
         run: |
-          kubectl rollout status deployment argo/argo-server
+          kubectl rollout status deployment/argo-server -n argo
         shell: bash        
       - name: Argo submit job
         run: |
