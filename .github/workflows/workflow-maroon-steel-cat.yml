@@ -20,27 +20,19 @@ jobs:
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
         shell: bash
-      - uses: AbsaOSS/k3d-action@v1.4.0
-        name: "Create Single Cluster"
-        with:
-          cluster-name: "test-cluster-1"
-          args: >-
-            -p "8083:80@agent[0]"
-            -p "8443:443@agent[0]"
-            -p "5053:53/udp@agent[0]"
-            --agents 3
-            --no-lb
-            --image docker.io/rancher/k3s:v1.20.4-k3s1
-            --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
-      - name: Cluster info
+      - name: Create k3d cluster
         run: |
-          echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}
-          echo
-          kubectl cluster-info --context k3d-test-cluster-1
-      - name: Nodes
+          k3d cluster create
+        shell: bash
+      - name: Kubernetes get kubectl
         run: |
-          docker ps -a
-          kubectl config use-context k3d-test-cluster-1
-          kubectl get nodes -o wide
-      - name: Network
-        run: docker network inspect k3d-action-bridge-network
+          curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
+        shell: bash
+      - name: kubectl make executable
+        run: |
+          chmod +x kubectl
+        shell: bash
+      - name: Kubernetes get cluster info
+        run: |
+          ./kubectl cluster-info
+        shell: bash
