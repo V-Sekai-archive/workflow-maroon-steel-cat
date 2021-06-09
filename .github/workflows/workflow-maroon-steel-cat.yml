@@ -3,7 +3,6 @@ on: [push, pull_request]
 jobs:
   build-ubuntu:
     runs-on: ubuntu-latest
-    container: 'fedora:34'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,12 +16,10 @@ jobs:
         run: |
           uname -a
         shell: bash
-
       - name: Install k3d
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
         shell: bash
-
       - uses: AbsaOSS/k3d-action@v1.4.0
         name: "Create Single Cluster"
         with:
@@ -35,3 +32,15 @@ jobs:
             --no-lb
             --image docker.io/rancher/k3s:v1.20.4-k3s1
             --k3s-server-arg "--no-deploy=traefik,servicelb,metrics-server"
+      - name: Cluster info
+        run: |
+          echo ${{ steps.single-cluster.outputs.network }} ${{ steps.single-cluster.outputs.subnet-CIDR }}
+          echo
+          kubectl cluster-info --context k3d-test-cluster-1
+      - name: Nodes
+        run: |
+          docker ps -a
+          kubectl config use-context k3d-test-cluster-1
+          kubectl get nodes -o wide
+      - name: Network
+        run: docker network inspect k3d-action-bridge-network
