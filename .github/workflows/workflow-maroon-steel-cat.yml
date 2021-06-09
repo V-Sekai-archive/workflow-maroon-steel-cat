@@ -27,7 +27,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create --agents=3 --kubeconfig-update-default=true
+          k3d cluster create --agents=3 --kubeconfig-update-default=true --kubeconfig-switch-context=true
         shell: bash        
       - name: Curl get kubectl
         run: |
