@@ -28,17 +28,17 @@ jobs:
         shell: bash
       - name: Install cillium
         run: |
-        helm install cilium cilium/cilium --version 1.8.3 \
-          --namespace kube-system \
-          --set global.nodeinit.enabled=true \
-          --set global.kubeProxyReplacement=partial \
-          --set global.hostServices.enabled=false \
-          --set global.externalIPs.enabled=true \
-          --set global.nodePort.enabled=true \
-          --set global.hostPort.enabled=true \
-          --set config.bpfMasquerade=false \
-          --set global.pullPolicy=IfNotPresent \
-          --set config.ipam=kubernetes
+          helm install cilium cilium/cilium --version 1.8.3 \
+            --namespace kube-system \
+            --set global.nodeinit.enabled=true \
+            --set global.kubeProxyReplacement=partial \
+            --set global.hostServices.enabled=false \
+            --set global.externalIPs.enabled=true \
+            --set global.nodePort.enabled=true \
+            --set global.hostPort.enabled=true \
+            --set config.bpfMasquerade=false \
+            --set global.pullPolicy=IfNotPresent \
+            --set config.ipam=kubernetes
         shell: bash
       - name: Curl get kubectl
         run: |
