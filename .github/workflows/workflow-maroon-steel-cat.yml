@@ -43,7 +43,11 @@ jobs:
         shell: bash        
       - name: Create k3d context
         run: |             
-          kubectl config use-context k3d-k3s-default
+          k3d kubeconfig merge maroon-steel-cat --kubeconfig-merge-default --kubeconfig-switch-context
+        shell: bash        
+      - name: Cluster Info
+        run: |             
+          kubectl cluster-info
         shell: bash        
       - name: Install helm
         run: |
