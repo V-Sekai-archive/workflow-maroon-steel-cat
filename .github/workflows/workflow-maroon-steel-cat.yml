@@ -80,6 +80,10 @@ jobs:
         run: |
           argo version
         shell: bash
+      - name: Test workflow-controller
+        run: |
+          kubectl describe po {workflow-controller pod}
+        shell: bash        
       - name: Argo submit job
         run: |
           argo submit -n argo --log --wait https://raw.githubusercontent.com/argoproj/argo-workflows/master/examples/hello-world.yaml
