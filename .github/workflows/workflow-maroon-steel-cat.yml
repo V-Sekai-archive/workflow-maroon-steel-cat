@@ -37,6 +37,9 @@ jobs:
         run: |
           cilium install
           cilium status --wait
+        shell: bash
+      - name: Cillium connectivity test
+        run: |
           cilium connectivity test
         shell: bash
       - name: Curl get kubectl
