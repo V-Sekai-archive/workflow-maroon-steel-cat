@@ -27,7 +27,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create --agents=3 --kubeconfig-switch-context
+          k3d cluster create --agents=3 --kubeconfig-update-default=true
         shell: bash        
       - name: Curl get kubectl
         run: |
@@ -41,21 +41,13 @@ jobs:
         run: |
           mv ./kubectl /usr/local/bin/kubectl
         shell: bash
-      - name: Install k3d
-        run: |
-          k3d kubeconfig merge k3d-k3s-default --switch-context
-        shell: bash
-      - name: Kubectl cluster-info
-        run: |
-          kubectl cluster-info
-        shell: bash
       - name: Install helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
         shell: bash
       - name: Get cluster info from kubectl
         run: |
-          kubectl cluster-info
+          kubectl cluster-info -api-port "$(docker-machine ip):6443
         shell: bash
       - name: Create argo namespace in k8s
         run: |
