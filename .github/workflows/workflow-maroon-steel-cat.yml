@@ -68,13 +68,13 @@ jobs:
         run: |
           argo version
         shell: bash
-      - name: Get pods
-        run: |
-          kubectl get pods --all-namespaces
-        shell: bash        
       - name: Wait for argo
         run: |
           kubectl rollout status deployment/argo-server -n argo
+        shell: bash        
+      - name: Get pods
+        run: |
+          kubectl get pods --all-namespaces
         shell: bash        
       - name: Argo submit job
         run: |
