@@ -52,7 +52,7 @@ jobs:
         shell: bash
       - name: Get cluster info from kubectl
         run: |
-          kubectl cluster-info -api-port "$(docker-machine ip):6443
+          kubectl cluster-info
         shell: bash
       - name: Create argo namespace in k8s
         run: |
