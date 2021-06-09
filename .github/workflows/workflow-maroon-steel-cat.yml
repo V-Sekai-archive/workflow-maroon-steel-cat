@@ -14,14 +14,13 @@ jobs:
         run: |
           uname -a
         shell: bash
-      - name: Install k3d
-        run: |
-          curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
-        shell: bash
-      - name: Create k3d cluster
-        run: |
-          k3d cluster create --agents=3
-        shell: bash
+      - uses: AbsaOSS/k3d-action@v1.4.0
+        name: "Create Single Cluster"
+        with:
+          cluster-name: "maroon-steel-cat-cluster-1"          
+          args:  >-
+            --agents 3
+            --no-lb
       - name: Install helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
