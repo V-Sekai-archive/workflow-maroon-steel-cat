@@ -6,12 +6,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.x
-      
+          python-version: 3.x      
       - name: Get host
         run: |
           uname -a
@@ -22,7 +20,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: |
-          k3d cluster create
+          k3d cluster create --k3s-server-arg="--flannel-backend=none" --volume /sys/fs/bpf:/sys/fs/bpf 
         shell: bash
       - name: Curl get kubectl
         run: |
