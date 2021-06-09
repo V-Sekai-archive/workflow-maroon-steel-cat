@@ -41,9 +41,9 @@ jobs:
         run: |
           mv ./kubectl /usr/local/bin/kubectl
         shell: bash
-      - name: Kubectl config use-context 
+      - name: Install k3d
         run: |
-          kubectl config use-context k3d-k3s-default
+          k3d kubeconfig merge k3d-k3s-default --switch-context
         shell: bash
       - name: Kubectl cluster-info
         run: |
