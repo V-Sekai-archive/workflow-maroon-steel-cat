@@ -22,6 +22,24 @@ jobs:
         run: |
           k3d cluster create --k3s-server-arg="--flannel-backend=none" --volume /sys/fs/bpf:/sys/fs/bpf 
         shell: bash
+      - name: Install helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+        shell: bash
+      - name: Install cillium
+        run: |
+        helm install cilium cilium/cilium --version 1.8.3 \
+          --namespace kube-system \
+          --set global.nodeinit.enabled=true \
+          --set global.kubeProxyReplacement=partial \
+          --set global.hostServices.enabled=false \
+          --set global.externalIPs.enabled=true \
+          --set global.nodePort.enabled=true \
+          --set global.hostPort.enabled=true \
+          --set config.bpfMasquerade=false \
+          --set global.pullPolicy=IfNotPresent \
+          --set config.ipam=kubernetes
+        shell: bash
       - name: Curl get kubectl
         run: |
           curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
