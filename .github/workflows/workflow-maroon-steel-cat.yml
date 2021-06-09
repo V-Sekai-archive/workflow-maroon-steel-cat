@@ -44,6 +44,9 @@ jobs:
       - name: Create k3d context
         run: |             
           kubectl config use-context k3d-k3s-default
+        shell: bash        
+      - name: Cluster Info
+        run: |             
           kubectl cluster-info --api-port host.k3d.internal:6443
         shell: bash        
       - name: Install helm
