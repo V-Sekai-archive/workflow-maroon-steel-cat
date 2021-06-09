@@ -80,9 +80,9 @@ jobs:
         run: |
           argo version
         shell: bash
-      - name: Test workflow-controller
+      - name: Get pods
         run: |
-          kubectl describe po {workflow-controller pod}
+          kubectl get pods --all-namespaces
         shell: bash        
       - name: Argo submit job
         run: |
