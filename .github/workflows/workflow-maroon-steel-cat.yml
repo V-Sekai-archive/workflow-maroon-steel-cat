@@ -28,7 +28,7 @@ jobs:
         shell: bash
       - name: Install cillium
         run: |
-          helm repo update
+          helm repo add cilium https://helm.cilium.io/
           helm install cilium cilium/cilium --version 1.8.3 \
             --namespace kube-system \
             --set global.nodeinit.enabled=true \
