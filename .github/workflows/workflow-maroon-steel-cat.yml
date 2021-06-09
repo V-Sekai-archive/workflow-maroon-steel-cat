@@ -24,15 +24,15 @@ jobs:
         run: |
           k3d cluster create
         shell: bash
-      - name: Kubernetes get kubectl
+      - name: Curl get kubectl
         run: |
           curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
         shell: bash
-      - name: kubectl make executable
+      - name: make executable kubectl 
         run: |
           chmod +x kubectl
         shell: bash
-      - name: Kubernetes get cluster info
+      - name: kubectl get cluster info
         run: |
           ./kubectl cluster-info
         shell: bash
