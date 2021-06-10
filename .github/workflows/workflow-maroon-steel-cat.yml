@@ -89,17 +89,13 @@ jobs:
         run: |
           argo submit -n argo argo-dag.yml
         shell: bash
-      - name: Argo submit job
+      - name: Sleep 30
         run: |
-          sleep 30
+          sleep 360
         shell: bash    
       - name: Argo get logs
         run: |
           argo list -n argo
           argo get -n argo @latest
           argo logs -n argo @latest
-        shell: bash
-      - name: Argo get logs try 2
-        run: |
-          xargs -l kubectl logs < kubectl get pods | grep diamond
         shell: bash
