@@ -101,5 +101,5 @@ jobs:
         shell: bash
       - name: Argo get logs try 2
         run: |
-          kubectl get -n argo pods | grep *diamond* | xargs -0L1 kubectl logs {}
+          kubectl get -n argo --no-headers -o custom-columns=":metadata.name" | xargs -0L1 kubectl logs 
         shell: bash
