@@ -490,7 +490,6 @@ local godot_pipeline(pipeline_name='',
   },
     {
       name: 'defaultStage',
-      clean_workspace: false,
       jobs: [
         {
           name: platform_info.platform_name + 'Job',
