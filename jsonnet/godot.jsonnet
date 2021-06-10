@@ -1423,7 +1423,7 @@ local godot_gdnative_pipelines =
     )
   ),
 } + {
-  ['gdnative_' + library_info.name + '.gopipeline.json']: generate_godot_gdnative_pipeline(
+  ['gdnative_' + library_info.name + '.gopipeline.yaml']: generate_godot_gdnative_pipeline(
     pipeline_name=library_info.pipeline_name,
     pipeline_dependency=godot_cpp_pipeline,
     gocd_group='beta',
@@ -1432,7 +1432,7 @@ local godot_gdnative_pipelines =
   )
   for library_info in all_gdnative_plugins
 } + {
-  'godot_groups_export.gopipeline.json'
+  'godot_groups_export.gopipeline.yaml'
   : std.prune(
     godot_tools_pipeline_export(
       pipeline_name=godot_template_groups_export,
@@ -1446,7 +1446,7 @@ local godot_gdnative_pipelines =
       enabled_export_platforms=enabled_groups_export_platforms,
     )
   ),
-  'docker_groups.gopipeline.json'
+  'docker_groups.gopipeline.yaml'
   : std.prune(
     build_docker_server(
       pipeline_name=docker_pipeline,
@@ -1459,7 +1459,7 @@ local godot_gdnative_pipelines =
       server_export_info=groups_export_configurations.linuxServer,
     )
   ),
-  'docker_uro.gopipeline.json'
+  'docker_uro.gopipeline.yaml'
   : std.prune(
     simple_docker_job(
       pipeline_name=docker_uro_pipeline,
@@ -1470,7 +1470,7 @@ local godot_gdnative_pipelines =
       docker_dir='.',
     )
   ),
-  'docker_video_decoder.gopipeline.json'
+  'docker_video_decoder.gopipeline.yaml'
   : std.prune(
     video_decoder_docker_job(
       pipeline_name=docker_video_decoder_pipeline,

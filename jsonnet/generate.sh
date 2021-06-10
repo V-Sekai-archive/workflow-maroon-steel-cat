@@ -1,2 +1,2 @@
-rm ../*.json
-jsonnet -m .. godot.jsonnet
+rm ../json/*.json
+jsonnet -m ../json/ godot.jsonnet
