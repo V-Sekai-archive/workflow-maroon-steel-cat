@@ -87,7 +87,7 @@ jobs:
         shell: bash        
       - name: Argo submit job
         run: |
-          argo submit -n argo --log argo-dag.yml
+          argo submit -n argo argo-dag.yml
         shell: bash
       - name: Argo submit job
         run: |
