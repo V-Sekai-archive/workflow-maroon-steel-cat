@@ -1,0 +1,205 @@
+{
+   "apiVersion": "argoproj.io/v1alpha1",
+   "kind": "Workflow",
+   "metadata": {
+      "generateName": "godot-template-chibifire-"
+   },
+   "spec": {
+      "entrypoint": "godot-template-chibifire",
+      "templates": [
+         {
+            "container": {
+               "command": [
+                  "sh",
+                  "{{godot-template-chibifireinputs.parameters.execute}}"
+               ],
+               "env": [
+                  {
+                     "name": "GODOT_STATUS",
+                     "value": "{{godot-template-chibifireinputs.parameters.GODOT_STATUS}}"
+                  }
+               ],
+               "image": "groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8",
+               "volumeMounts": [
+                  {
+                     "mountPath": "/tmp/out",
+                     "name": "out"
+                  }
+               ],
+               "workingDir": "/tmp/out/windows/g"
+            },
+            "inputs": {
+               "artifacts": [
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot.git",
+                        "revision": "groups-4.x"
+                     },
+                     "name": "godot_sandbox",
+                     "path": "/tmp/out/windows/g"
+                  },
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot-modules-groups.git",
+                        "revision": "groups-modules-4.x"
+                     },
+                     "name": "godot_sandbox_modules",
+                     "path": "/tmp/out/windows/godot_custom_modules"
+                  }
+               ]
+            },
+            "name": "godot-windows-builder"
+         },
+         {
+            "container": {
+               "command": [
+                  "sh",
+                  "{{godot-template-chibifireinputs.parameters.execute}}"
+               ],
+               "env": [
+                  {
+                     "name": "GODOT_STATUS",
+                     "value": "{{godot-template-chibifireinputs.parameters.GODOT_STATUS}}"
+                  }
+               ],
+               "image": "groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8",
+               "volumeMounts": [
+                  {
+                     "mountPath": "/tmp/out",
+                     "name": "out"
+                  }
+               ],
+               "workingDir": "/tmp/out/linux/g"
+            },
+            "inputs": {
+               "artifacts": [
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot.git",
+                        "revision": "groups-4.x"
+                     },
+                     "name": "godot_sandbox",
+                     "path": "/tmp/out/linux/g"
+                  },
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot-modules-groups.git",
+                        "revision": "groups-modules-4.x"
+                     },
+                     "name": "godot_sandbox_modules",
+                     "path": "/tmp/out/linux/godot_custom_modules"
+                  }
+               ]
+            },
+            "name": "godot-linux-builder"
+         },
+         {
+            "container": {
+               "command": [
+                  "sh",
+                  "{{godot-template-chibifireinputs.parameters.execute}}"
+               ],
+               "env": [
+                  {
+                     "name": "GODOT_STATUS",
+                     "value": "{{godot-template-chibifireinputs.parameters.GODOT_STATUS}}"
+                  }
+               ],
+               "image": "groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8",
+               "volumeMounts": [
+                  {
+                     "mountPath": "/tmp/out",
+                     "name": "out"
+                  }
+               ],
+               "workingDir": "/tmp/out/macos/g"
+            },
+            "inputs": {
+               "artifacts": [
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot.git",
+                        "revision": "groups-4.x"
+                     },
+                     "name": "godot_sandbox",
+                     "path": "/tmp/out/macos/g"
+                  },
+                  {
+                     "git": {
+                        "repo": "https://github.com/V-Sekai/godot-modules-groups.git",
+                        "revision": "groups-modules-4.x"
+                     },
+                     "name": "godot_sandbox_modules",
+                     "path": "/tmp/out/macos/godot_custom_modules"
+                  }
+               ]
+            },
+            "name": "godot-macos-builder"
+         },
+         {
+            "dag": {
+               "tasks": [
+                  {
+                     "arguments": {
+                        "parameters": [
+                           {
+                              "name": "execute",
+                              "value": "cd g && sed -i \"/^status =/s/=.*/= \"$GODOT_STATUS\"/\" version.py && PATH=/opt/llvm-mingw/bin:$PATH scons werror=no platform=windows target=release_debug -j`nproc` use_lto=no deprecated=no use_mingw=yes use_thinlto=yes custom_modules=../godot_custom_modules && mv g/bin/windowsgodot.windows.opt.tools.64.exe /tmp/out/windows/godot.windows.opt.tools.64.exe && mv g/bin/godot.windows.opt.tools.64.pdb /tmp/out/godot.windows.opt.tools.64.pdb"
+                           },
+                           {
+                              "name": "GODOT_STATUS",
+                              "value": "godot_status"
+                           }
+                        ]
+                     },
+                     "name": "windowsJob",
+                     "template": "godot-windows-builder"
+                  },
+                  {
+                     "arguments": {
+                        "parameters": [
+                           {
+                              "name": "execute",
+                              "value": "cd g && sed -i \"/^status =/s/=.*/= \"$GODOT_STATUS\"/\" version.py && scons werror=no platform=x11 target=release_debug -j`nproc` use_lto=no deprecated=no use_static_cpp=yes use_llvm=yes builtin_freetype=yes custom_modules=../godot_custom_modules && mv g/bin/linuxgodot.x11.opt.tools.64.llvm /tmp/out/linux/godot.x11.opt.tools.64.llvm"
+                           },
+                           {
+                              "name": "GODOT_STATUS",
+                              "value": "godot_status"
+                           }
+                        ]
+                     },
+                     "name": "linuxJob",
+                     "template": "godot-linux-builder"
+                  },
+                  {
+                     "arguments": {
+                        "parameters": [
+                           {
+                              "name": "execute",
+                              "value": "cd g && sed -i \"/^status =/s/=.*/= \"$GODOT_STATUS\"/\" version.py && OSXCROSS_ROOT=\"LD_LIBRARY_PATH=/opt/osxcross/target/bin /opt/osxcross\" scons werror=no platform=osx target=release_debug -j`nproc` use_lto=no deprecated=no osxcross_sdk=darwin19 CXXFLAGS=\"-Wno-deprecated-declarations -Wno-error \" builtin_freetype=yes custom_modules=../godot_custom_modules && mv g/bin/macosgodot.osx.opt.tools.64 /tmp/out/macos/godot.osx.opt.tools.64"
+                           },
+                           {
+                              "name": "GODOT_STATUS",
+                              "value": "godot_status"
+                           }
+                        ]
+                     },
+                     "name": "macosJob",
+                     "template": "godot-macos-builder"
+                  }
+               ]
+            },
+            "name": "godot-template-chibifire"
+         }
+      ],
+      "volumes": [
+         {
+            "hostPath": {
+               "path": "/tmp/out",
+               "type": "Directory"
+            },
+            "name": "out"
+         }
+      ]
+   }
+}
