@@ -99,3 +99,7 @@ jobs:
           argo get -n argo @latest
           argo logs -n argo @latest
         shell: bash
+      - name: Get all pod logs
+        run: |
+          xargs -l kubectl logs < kubectl get pods | grep diamond
+        shell: bash
