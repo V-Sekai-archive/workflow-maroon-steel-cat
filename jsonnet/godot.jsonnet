@@ -428,7 +428,7 @@ local godot_pipeline(pipeline_name='',
       "artifacts": [
         {
           "name": "godot_sandbox",
-          "path": "/src/" + platform_info.platform_name + "/g",
+          "path": "/tmp/out/" + platform_info.platform_name + "/g",
           "git": {
             "repo": godot_git,
             "revision": godot_branch
@@ -437,7 +437,7 @@ local godot_pipeline(pipeline_name='',
         if godot_modules_git != '' then
           {
             "name": "godot_sandbox_modules",
-            "path": "/src/" + platform_info.platform_name + "/godot_custom_modules",
+            "path": "/tmp/out/" + platform_info.platform_name + "/godot_custom_modules",
             "git": {
               "repo": godot_modules_git,
               "revision": godot_modules_branch,
@@ -451,7 +451,7 @@ local godot_pipeline(pipeline_name='',
       "command": [
         "sh", "{{" + pipeline_name + "inputs.parameters.execute}}"
       ],      
-      "workingDir": "/src/" + platform_info.platform_name,
+      "workingDir": "/tmp/out/" + platform_info.platform_name + "/g",
       "volumeMounts": [
         {
           "mountPath": "/tmp/out",
