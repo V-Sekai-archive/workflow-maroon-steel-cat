@@ -99,7 +99,7 @@ jobs:
           argo get -n argo @latest
           argo logs -n argo @latest
         shell: bash
-      - name: Argo get logs try 2
+      - name: Argo get logs via kubernetes
         run: |
-          kubectl get pod -n argo --no-headers -o custom-columns=":metadata.name" | xargs -0L1 kubectl logs 
+          kubectl get pod -n argo --no-headers -o custom-columns=":metadata.name" | xargs -0L1 -d '\n' kubectl logs
         shell: bash
