@@ -76,9 +76,9 @@ jobs:
         run: |
           kubectl get pods --all-namespaces
         shell: bash     
-      - name: Ensure /mnt/out exists
+      - name: Ensure /tmp/out exists
         run: |
-          mkdir -p /mnt/out
+          mkdir -p /tmp/out
         shell: bash
       - name: Argo submit job
         run: |
@@ -87,4 +87,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: message
-          path: /mnt/out/message
+          path: /tmp/out/message

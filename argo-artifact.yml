@@ -41,13 +41,13 @@ spec:
       # unpack the message input artifact
       # and put it at /tmp/message
       - name: message
-        path: /mnt/out/message
+        path: /tmp/out/message
     outputs:
       parameters:
         - name: message
           valueFrom:
-            path: /mnt/out/message
+            path: /tmp/out/message
     container:
       image: alpine:latest
       command: [sh, -c]
-      args: ["cat /mnt/out/message"]
+      args: ["cat /tmp/out/message"]
