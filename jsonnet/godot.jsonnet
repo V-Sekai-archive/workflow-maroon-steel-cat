@@ -440,12 +440,12 @@ local godot_pipeline(pipeline_name='',
   ],
   "templates": [
   {
-    "name": "godot-linux-builder",
+    "name": "godot-" + platform_info.platform_name + "-builder",
     "inputs": {
       "artifacts": [
         {
           "name": "godot_sandbox",
-          "path": "/tmp/out/godot",
+          "path": "/tmp/out/godot_" + platform_info.platform_name,
           "git": {
             "repo": godot_git,
             "revision": godot_branch
@@ -454,7 +454,7 @@ local godot_pipeline(pipeline_name='',
         if godot_modules_git != '' then
           {
             "name": "godot_sandbox_modules",
-            "path": "/tmp/out/godot_custom_modules",
+            "path": "/tmp/out/godot_custom_modules_" + platform_info.platform_name,
             "git": {
               "repo": godot_modules_git,
               "revision": godot_modules_branch
@@ -484,15 +484,15 @@ local godot_pipeline(pipeline_name='',
         //   "value": "{{inputs.parameters.env}}", 
         // },
       ],
-    }
-  },
+    },
+  } for platform_info in enabled_engine_platforms] + [
   {
     "name": pipeline_name,
     "dag": {
       "tasks": [
         {          
           name: platform_info.platform_name + 'Job',
-          "template": "godot-linux-builder",          
+          "template": "godot-" + platform_info.platform_name + "-builder",          
           "arguments": {
             "parameters": [
               {
