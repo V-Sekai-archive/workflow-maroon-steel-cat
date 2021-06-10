@@ -9,15 +9,15 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.x      
+          python-version: 3.x
       - name: Get host
         run: |
           uname -a
-        shell: bash    
+        shell: bash
       - name: Install k3d
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
-        shell: bash        
+        shell: bash
       - name: Create k3d cluster
         run: |
           k3d cluster create --agents=3
@@ -26,22 +26,22 @@ jobs:
         run: |
           curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
         shell: bash
-      - name: Make executable kubectl 
+      - name: Make executable kubectl
         run: |
           chmod +x kubectl
         shell: bash
       - name: Move binary to path
         run: |
           sudo mv ./kubectl /usr/local/bin/kubectl
-        shell: bash        
+        shell: bash
       - name: Create k3d context
-        run: |             
+        run: |
           kubectl config use-context k3d-k3s-default
-        shell: bash        
+        shell: bash
       - name: Cluster Info
-        run: |             
+        run: |
           kubectl cluster-info
-        shell: bash        
+        shell: bash
       - name: Create argo namespace in k8s
         run: |
           kubectl create ns argo
@@ -71,11 +71,11 @@ jobs:
       - name: Wait for argo
         run: |
           kubectl rollout status deployment/argo-server -n argo
-        shell: bash        
+        shell: bash
       - name: Get pods
         run: |
           kubectl get pods --all-namespaces
-        shell: bash        
+        shell: bash
       - name: Argo submit job
         run: |
           argo submit -n argo ---watch argo-dag.yml
