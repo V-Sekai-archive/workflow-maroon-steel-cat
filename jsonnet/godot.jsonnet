@@ -12,7 +12,8 @@ local platform_info_dict = {
     scons_platform: 'windows',
     gdnative_platform: 'windows',
     strip_command: 'mingw-strip --strip-debug',
-    godot_scons_arguments: "use_mingw=yes use_llvm=yes use_lld=yes use_thinlto=yes LINKFLAGS=-Wl,-pdb= CCFLAGS='-g -gcodeview' debug_symbols=no",
+    // godot_scons_arguments: "use_mingw=yes use_llvm=yes use_lld=yes use_thinlto=yes LINKFLAGS=-Wl,-pdb= CCFLAGS='-g -gcodeview' debug_symbols=no",
+    godot_scons_arguments: "use_mingw=yes use_llvm=yes use_lld=yes use_thinlto=yes",
     extra_commands: [],
     environment_variables: [],
     template_artifacts_override: null,
@@ -31,24 +32,6 @@ local platform_info_dict = {
     gdnative_platform: 'linux',
     strip_command: 'strip --strip-debug',
     godot_scons_arguments: 'use_static_cpp=yes use_llvm=yes builtin_freetype=yes',
-    extra_commands: [],
-    environment_variables: [],
-    template_artifacts_override: null,
-    template_output_artifacts: null,
-    template_extra_commands: [],
-  },
-  server: {
-    platform_name: 'server',
-    scons_env: '',
-    intermediate_godot_binary: HEADLESS_SERVER_EDITOR,
-    editor_godot_binary: HEADLESS_SERVER_EDITOR,
-    template_debug_binary: 'server_64_debug',
-    template_release_binary: 'server_64_release',
-    export_directory: 'export_linux_server',
-    scons_platform: 'server',
-    gdnative_platform: 'linux',
-    strip_command: 'strip --strip-debug',
-    godot_scons_arguments: 'use_static_cpp=yes use_llvm=yes',  // FIXME: use_llvm=yes????
     extra_commands: [],
     environment_variables: [],
     template_artifacts_override: null,
@@ -124,9 +107,9 @@ local platform_info_dict = {
   },
 };
 
-local enabled_engine_platforms = [platform_info_dict[x] for x in ['windows', 'linux', 'server', 'macos']];
+local enabled_engine_platforms = [platform_info_dict[x] for x in ['windows', 'linux', 'macos']];
 
-local enabled_template_platforms = [platform_info_dict[x] for x in ['windows', 'linux', 'server', 'web', 'macos']];
+local enabled_template_platforms = [platform_info_dict[x] for x in ['windows', 'linux', 'web', 'macos']];
 
 local enabled_gdnative_platforms = [platform_info_dict[x] for x in ['windows', 'linux', 'macos']];
 
@@ -445,7 +428,7 @@ local godot_pipeline(pipeline_name='',
       "artifacts": [
         {
           "name": "godot_sandbox",
-          "path": "/tmp/out/godot_" + platform_info.platform_name,
+          "path": "/src/" + platform_info.platform_name + "/g",
           "git": {
             "repo": godot_git,
             "revision": godot_branch
@@ -454,10 +437,10 @@ local godot_pipeline(pipeline_name='',
         if godot_modules_git != '' then
           {
             "name": "godot_sandbox_modules",
-            "path": "/tmp/out/godot_custom_modules_" + platform_info.platform_name,
+            "path": "/src/" + platform_info.platform_name + "/godot_custom_modules",
             "git": {
               "repo": godot_modules_git,
-              "revision": godot_modules_branch
+              "revision": godot_modules_branch,
             }
           }
         else null,
@@ -467,7 +450,8 @@ local godot_pipeline(pipeline_name='',
       "image": "groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8",
       "command": [
         "sh", "{{" + pipeline_name + "inputs.parameters.execute}}"
-      ],
+      ],      
+      "workingDir": "/src/" + platform_info.platform_name,
       "volumeMounts": [
         {
           "mountPath": "/tmp/out",
@@ -497,17 +481,14 @@ local godot_pipeline(pipeline_name='',
             "parameters": [
               {
                 "name": "execute",
-                "value": 
-                  "mv 'g/bin/'" + platform_info.editor_godot_binary + " /tmp/out/"  + platform_info.editor_godot_binary + 
-                  if std.endsWith(platform_info.editor_godot_binary, '.exe') then
-                    " && mv 'g/bin/'" + exe_to_pdb_path(platform_info.editor_godot_binary) + " /tmp/out/"  + exe_to_pdb_path(platform_info.editor_godot_binary)
-                  else null +     
-                  ' && sed -i "/^status =/s/=.*/= \\" + $GODOT_STATUS\\"/" version.py' +           
+                "value":      
+                  'cd g && sed -i "/^status =/s/=.*/= \"$GODOT_STATUS\"/" version.py' +           
                   " && " + platform_info.scons_env + 'scons werror=no platform=' + platform_info.scons_platform + ' target=release_debug -j`nproc` use_lto=no deprecated=no ' + platform_info.godot_scons_arguments +
-                  if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' else '' +             
-                  if platform_info.editor_godot_binary != platform_info.intermediate_godot_binary then              
-                    ' && cp -p g/bin/' + platform_info.intermediate_godot_binary + 'g/bin/' + platform_info.editor_godot_binary
-                  else null,
+                  if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' +
+                  if platform_info.editor_godot_binary != platform_info.intermediate_godot_binary then ' && cd - && cp -p g/bin/' + platform_info.intermediate_godot_binary + 'g/bin/' + platform_info.editor_godot_binary else '' +
+                  " && mv g/bin/" + platform_info.platform_name + platform_info.editor_godot_binary + " /tmp/out/" + platform_info.platform_name + "/" + platform_info.editor_godot_binary +
+                  if std.endsWith(platform_info.editor_godot_binary, '.exe') then
+                    " && mv g/bin/" + exe_to_pdb_path(platform_info.editor_godot_binary) + " /tmp/out/"  + exe_to_pdb_path(platform_info.editor_godot_binary) else '' 
               },
               {
                 "name": "GODOT_STATUS",

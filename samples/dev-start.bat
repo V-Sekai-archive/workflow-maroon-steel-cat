@@ -5,4 +5,6 @@ kubectl cluster-info
 kubectl create ns argo
 kubectl apply -n argo --wait=true -f quick-start-postgres.yml
 kubectl rollout status deployment/argo-server -n argo
+docker pull groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8
+k3d image import groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8
 argo submit -n argo --log argo-artifact.yml
