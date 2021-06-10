@@ -82,7 +82,7 @@ jobs:
         shell: bash
       - name: Argo submit job
         run: |
-          argo submit -n argo --log argo-artifact.yml
+          argo submit -n argo --log samples/argo-artifact.yml
         shell: bash
       - uses: actions/upload-artifact@v2
         with:
