@@ -426,28 +426,9 @@ local godot_pipeline(pipeline_name='',
   "kind": "Workflow",
   "metadata": {
     "generateName": pipeline_name + "-",
-    "GODOT_STATUS": godot_status,
-    "materials": [{
-        name: "godot_sandbox",
-        url: godot_git,
-        type: 'git',
-        branch: godot_branch,
-        destination: 'g',    
-      },
-      if godot_modules_git != '' then
-        {
-          name: 'godot_custom_modules',
-          url: godot_modules_git,
-          type: 'git',
-          branch: godot_modules_branch,
-          destination: 'godot_custom_modules',
-          shallow_clone: false,
-        }
-      else null,
-    ]  
   },
   "spec": {
-  "entrypoint": "artifact-example",
+  "entrypoint": pipeline_name,
   "volumes": [
     {
       "name": "out",
@@ -459,273 +440,274 @@ local godot_pipeline(pipeline_name='',
   ],
   "templates": [
   {
-    "name": "whalesay",
+    "name": "godot-linux-builder",
+    "inputs": {
+      "artifacts": [
+        {
+          "name": "godot_sandbox",
+          "path": "/tmp/out/godot",
+          "git": {
+            "repo": godot_git,
+            "revision": godot_branch
+          }
+        },
+        if godot_modules_git != '' then
+          {
+            "name": "godot_sandbox_modules",
+            "path": "/tmp/out/godot_custom_modules",
+            "git": {
+              "repo": godot_modules_git,
+              "revision": godot_modules_branch
+            }
+          }
+        else null,
+      ]
+    },
     "container": {
-      "image": "docker/whalesay:latest",
+      "image": "groupsinfra/gocd-agent-centos-8-groups:v21.2.0-groups-0.5.8",
       "command": [
-        "sh",
-        "-c"
-      ],
-      "args": [
-        "cowsay hello world | tee /tmp/out/message_out"
+        "sh", "{{" + pipeline_name + "inputs.parameters.execute}}"
       ],
       "volumeMounts": [
         {
           "mountPath": "/tmp/out",
           "name": "out"
         }
-      ]
+      ],
+      "env":  [
+        { 
+          "name": "GODOT_STATUS",
+          "value": "{{" + pipeline_name + "inputs.parameters.GODOT_STATUS}}", 
+        },
+        // { 
+        //   "name": "env",
+        //   "value": "{{inputs.parameters.env}}", 
+        // },
+      ],
     }
   },
   {
-    "name": "artifact-example",
+    "name": pipeline_name,
     "dag": {
       "tasks": [
-        {
-          "name": "generate-artifact",
-          "template": "whalesay"
-        },
-      ],
-    },
-  },
-    {
-      name: 'defaultStage',
-      jobs: [
-        {
+        {          
           name: platform_info.platform_name + 'Job',
-          resources: [
-            'mingw5',
-            'linux',
-          ],
-          artifacts: [
-            {
-              source: 'g/bin/' + platform_info.editor_godot_binary,
-              destination: '',
-              type: 'build',
-            },
-            if std.endsWith(platform_info.editor_godot_binary, '.exe') then {
-              source: 'g/bin/' + exe_to_pdb_path(platform_info.editor_godot_binary),
-              destination: '',
-              type: 'build',
-            } else null,
-          ],
-          environment_variables: platform_info.environment_variables,
-          tasks: [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'sed -i "/^status =/s/=.*/= \\"$GODOT_STATUS.$GO_PIPELINE_COUNTER\\"/" version.py',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                platform_info.scons_env + 'scons werror=no platform=' + platform_info.scons_platform + ' target=release_debug -j`nproc` use_lto=no deprecated=no ' + platform_info.godot_scons_arguments +
-                if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' else '',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-            if platform_info.editor_godot_binary != platform_info.intermediate_godot_binary then
+          "template": "godot-linux-builder",          
+          "arguments": {
+            "parameters": [
               {
-                type: 'exec',
-                arguments: [
-                  '-c',
-                  'cp -p g/bin/' + platform_info.intermediate_godot_binary + 'g/bin/' + platform_info.editor_godot_binary,
-                ],
-                command: '/bin/bash',
-              }
-            else null,
-          ],
+                "name": "execute",
+                "value": 
+                  "mv 'g/bin/'" + platform_info.editor_godot_binary + " /tmp/out/"  + platform_info.editor_godot_binary + 
+                  if std.endsWith(platform_info.editor_godot_binary, '.exe') then
+                    " && mv 'g/bin/'" + exe_to_pdb_path(platform_info.editor_godot_binary) + " /tmp/out/"  + exe_to_pdb_path(platform_info.editor_godot_binary)
+                  else null +     
+                  ' && sed -i "/^status =/s/=.*/= \\" + $GODOT_STATUS\\"/" version.py' +           
+                  " && " + platform_info.scons_env + 'scons werror=no platform=' + platform_info.scons_platform + ' target=release_debug -j`nproc` use_lto=no deprecated=no ' + platform_info.godot_scons_arguments +
+                  if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' else '' +             
+                  if platform_info.editor_godot_binary != platform_info.intermediate_godot_binary then              
+                    ' && cp -p g/bin/' + platform_info.intermediate_godot_binary + 'g/bin/' + platform_info.editor_godot_binary
+                  else null,
+              },
+              {
+                "name": "GODOT_STATUS",
+                "value": "godot_status"
+              },      
+              // [     
+              //   {
+              //     "name": environment_variable.name,
+              //     "value": environment_variable.value
+              //   },
+              //   for environment_variable in platform_info.environment_variables
+              // ],
+            ]
+          },
         }
         for platform_info in enabled_engine_platforms
       ],
     },
-    {
-      name: 'templateStage',
-      jobs: [
-        {
-          name: platform_info.platform_name + 'Job',
-          resources: [
-            'linux',
-            'mingw5',
-          ],
-          artifacts: if platform_info.template_artifacts_override != null then platform_info.template_artifacts_override else [
-            {
-              type: 'build',
-              source: 'g/bin/' + platform_info.template_debug_binary,
-              destination: '',
-            },
-            {
-              type: 'build',
-              source: 'g/bin/' + platform_info.template_release_binary,
-              destination: '',
-            },
-            {
-              type: 'build',
-              source: 'g/bin/version.txt',
-              destination: '',
-            },
-          ],
-          environment_variables: platform_info.environment_variables,
-          tasks: [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                extra_command,
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            }
-            for extra_command in platform_info.extra_commands
-          ] + [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'sed -i "/^status =/s/=.*/= \\"$GODOT_STATUS.$GO_PIPELINE_COUNTER\\"/" version.py',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-            if platform_info.editor_godot_binary == platform_info.intermediate_godot_binary then {
-              type: 'fetch',
-              artifact_origin: 'gocd',
-              pipeline: pipeline_name,
-              stage: 'defaultStage',
-              job: platform_info.platform_name + 'Job',
-              is_source_a_file: true,
-              source: platform_info.intermediate_godot_binary,
-              destination: 'g/bin/',
-            } else {
-              type: 'exec',
-              arguments: [
-                '-c',
-                platform_info.scons_env + 'scons werror=no platform=' + platform_info.scons_platform + ' target=release_debug -j`nproc` use_lto=no deprecated=no ' + platform_info.godot_scons_arguments + if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' else '',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'cp bin/' + platform_info.intermediate_godot_binary + ' bin/' + platform_info.template_debug_binary + ' && cp bin/' + platform_info.intermediate_godot_binary + ' bin/' + platform_info.template_release_binary + if platform_info.strip_command != null then ' && ' + platform_info.strip_command + ' bin/' + platform_info.template_release_binary else '',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'eval `sed -e "s/ = /=/" version.py` && declare "_tmp$patch=.$patch" "_tmp0=" "_tmp=_tmp$patch" && echo $major.$minor${!_tmp}.$GODOT_STATUS.$GO_PIPELINE_COUNTER > bin/version.txt',
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            },
-          ] + [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                extra_command,
-              ],
-              command: '/bin/bash',
-              working_directory: 'g',
-            }
-            for extra_command in platform_info.template_extra_commands
-          ],
-        }
-        for platform_info in enabled_template_platforms
-      ],
-    },
-    {
-      name: 'templateZipStage',
-      jobs: [
-        {
-          name: 'defaultJob',
-          resources: [
-            'linux',
-            'mingw5',
-          ],
-          artifacts: [
-            {
-              type: 'build',
-              source: 'godot.templates.tpz',
-              destination: '',
-            },
-          ],
-          tasks: [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'rm -rf templates',
-              ],
-              command: '/bin/bash',
-            },
-            {
-              type: 'fetch',
-              artifact_origin: 'gocd',
-              is_source_a_file: true,
-              source: 'version.txt',
-              destination: 'templates',
-              pipeline: pipeline_name,
-              stage: 'templateStage',
-              job: enabled_template_platforms[0].platform_name + 'Job',
-            },
-            {
-              type: 'fetch',
-              artifact_origin: 'gocd',
-              is_source_a_file: true,
-              source: exe_to_pdb_path(platform_info_dict.windows.editor_godot_binary),
-              destination: 'templates',
-              pipeline: pipeline_name,
-              stage: 'defaultStage',
-              job: 'windowsJob',
-            },
-          ] + std.flatMap(function(platform_info) [
-            {
-              type: 'fetch',
-              artifact_origin: 'gocd',
-              is_source_a_file: true,
-              source: output_artifact,
-              destination: 'templates',
-              pipeline: pipeline_name,
-              stage: 'templateStage',
-              job: platform_info.platform_name + 'Job',
-            }
-            for output_artifact in if platform_info.template_output_artifacts != null then platform_info.template_output_artifacts else [
-              platform_info.template_debug_binary,
-              platform_info.template_release_binary,
-            ]
-          ], enabled_template_platforms) + [
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'rm -rf godot.templates.tpz',
-              ],
-              command: '/bin/bash',
-            },
-            {
-              type: 'exec',
-              arguments: [
-                '-c',
-                'zip -9 godot.templates.tpz templates/*',
-              ],
-              command: '/bin/bash',
-            },
-          ],
-        },
-      ],
-    },
+  },
+    // {
+    //   name: 'templateStage',
+    //   jobs: [
+    //     {
+    //       name: platform_info.platform_name + 'Job',
+    //       resources: [
+    //         'linux',
+    //         'mingw5',
+    //       ],
+    //       artifacts: if platform_info.template_artifacts_override != null then platform_info.template_artifacts_override else [
+    //         {
+    //           type: 'build',
+    //           source: 'g/bin/' + platform_info.template_debug_binary,
+    //           destination: '',
+    //         },
+    //         {
+    //           type: 'build',
+    //           source: 'g/bin/' + platform_info.template_release_binary,
+    //           destination: '',
+    //         },
+    //         {
+    //           type: 'build',
+    //           source: 'g/bin/version.txt',
+    //           destination: '',
+    //         },
+    //       ],
+    //       environment_variables: platform_info.environment_variables,
+    //       tasks: [
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             extra_command,
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         }
+    //         for extra_command in platform_info.extra_commands
+    //       ] + [
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'sed -i "/^status =/s/=.*/= \\"$GODOT_STATUS.$GO_PIPELINE_COUNTER\\"/" version.py',
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         },
+    //         if platform_info.editor_godot_binary == platform_info.intermediate_godot_binary then {
+    //           type: 'fetch',
+    //           artifact_origin: 'gocd',
+    //           pipeline: pipeline_name,
+    //           stage: 'defaultStage',
+    //           job: platform_info.platform_name + 'Job',
+    //           is_source_a_file: true,
+    //           source: platform_info.intermediate_godot_binary,
+    //           destination: 'g/bin/',
+    //         } else {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             platform_info.scons_env + 'scons werror=no platform=' + platform_info.scons_platform + ' target=release_debug -j`nproc` use_lto=no deprecated=no ' + platform_info.godot_scons_arguments + if godot_modules_git != '' then ' custom_modules=../godot_custom_modules' else '',
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         },
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'cp bin/' + platform_info.intermediate_godot_binary + ' bin/' + platform_info.template_debug_binary + ' && cp bin/' + platform_info.intermediate_godot_binary + ' bin/' + platform_info.template_release_binary + if platform_info.strip_command != null then ' && ' + platform_info.strip_command + ' bin/' + platform_info.template_release_binary else '',
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         },
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'eval `sed -e "s/ = /=/" version.py` && declare "_tmp$patch=.$patch" "_tmp0=" "_tmp=_tmp$patch" && echo $major.$minor${!_tmp}.$GODOT_STATUS.$GO_PIPELINE_COUNTER > bin/version.txt',
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         },
+    //       ] + [
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             extra_command,
+    //           ],
+    //           command: '/bin/bash',
+    //           working_directory: 'g',
+    //         }
+    //         for extra_command in platform_info.template_extra_commands
+    //       ],
+    //     }
+    //     for platform_info in enabled_template_platforms
+    //   ],
+    // },
+    // {
+    //   name: 'templateZipStage',
+    //   jobs: [
+    //     {
+    //       name: 'defaultJob',
+    //       resources: [
+    //         'linux',
+    //         'mingw5',
+    //       ],
+    //       artifacts: [
+    //         {
+    //           type: 'build',
+    //           source: 'godot.templates.tpz',
+    //           destination: '',
+    //         },
+    //       ],
+    //       tasks: [
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'rm -rf templates',
+    //           ],
+    //           command: '/bin/bash',
+    //         },
+    //         {
+    //           type: 'fetch',
+    //           artifact_origin: 'gocd',
+    //           is_source_a_file: true,
+    //           source: 'version.txt',
+    //           destination: 'templates',
+    //           pipeline: pipeline_name,
+    //           stage: 'templateStage',
+    //           job: enabled_template_platforms[0].platform_name + 'Job',
+    //         },
+    //         {
+    //           type: 'fetch',
+    //           artifact_origin: 'gocd',
+    //           is_source_a_file: true,
+    //           source: exe_to_pdb_path(platform_info_dict.windows.editor_godot_binary),
+    //           destination: 'templates',
+    //           pipeline: pipeline_name,
+    //           stage: 'defaultStage',
+    //           job: 'windowsJob',
+    //         },
+    //       ] + std.flatMap(function(platform_info) [
+    //         {
+    //           type: 'fetch',
+    //           artifact_origin: 'gocd',
+    //           is_source_a_file: true,
+    //           source: output_artifact,
+    //           destination: 'templates',
+    //           pipeline: pipeline_name,
+    //           stage: 'templateStage',
+    //           job: platform_info.platform_name + 'Job',
+    //         }
+    //         for output_artifact in if platform_info.template_output_artifacts != null then platform_info.template_output_artifacts else [
+    //           platform_info.template_debug_binary,
+    //           platform_info.template_release_binary,
+    //         ]
+    //       ], enabled_template_platforms) + [
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'rm -rf godot.templates.tpz',
+    //           ],
+    //           command: '/bin/bash',
+    //         },
+    //         {
+    //           type: 'exec',
+    //           arguments: [
+    //             '-c',
+    //             'zip -9 godot.templates.tpz templates/*',
+    //           ],
+    //           command: '/bin/bash',
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
   ],
   },
 };
