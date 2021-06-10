@@ -4,28 +4,21 @@ metadata:
   generateName: artifact-passing-
 spec:
   entrypoint: artifact-example
-  volumeClaimTemplates:                 # define volume, same syntax as k8s Pod spec
-  - metadata:
-      name: workdir                     # name of volume claim
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 0.1Gi                  # Gi => 1024 * 1024 * 1024
+  volumes:
+  - name: out
+    hostPath:
+      path: /tmp/out
+      type: Directory
   templates:
   - name: artifact-example
     steps:
     - - name: generate-artifact
-        template: whalesay         
+        template: whalesay        
   - name: whalesay
     container:
       image: docker/whalesay:latest
       command: [sh, -c]
-      args: ["cowsay hello world | tee /mnt/out/message_out"]
+      args: ["cowsay hello world | tee /tmp/out/message_out"]   
       volumeMounts:
-        - name: workdir
-          mountPath: /mnt/out
-    outputs:
-      artifacts:
-      - name: workdir
-        path: /mnt/out/message_out
+      - mountPath: /tmp/out
+        name: out
