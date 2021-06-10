@@ -13,10 +13,14 @@ jobs:
       - name: Get host
         run: |
           uname -a
-        shell: bash
+        shell: bash    
       - name: Install k3d
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
+        shell: bash        
+      - name: Image import
+        run: |
+          k3d image import argoproj/argoexec:latest
         shell: bash
       - name: Create k3d cluster
         run: |
@@ -82,5 +86,5 @@ jobs:
         shell: bash        
       - name: Argo submit job
         run: |
-          argo submit -n argo --watch argo-dag.yml
+          argo submit -n argo argo-dag.yml
         shell: bash
