@@ -91,7 +91,7 @@ jobs:
         shell: bash
       - name: Sleep 30
         run: |
-          sleep 360
+          sleep 30
         shell: bash    
       - name: Argo get logs
         run: |
