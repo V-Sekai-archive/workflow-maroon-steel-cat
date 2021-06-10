@@ -1,2 +1,2 @@
-..\thirdparty\bin\jsonnet.exe -m ..\json\ godot.jsonnet
-..\thirdparty\bin\dos2unix ..\json\*.json
+..\thirdparty\bin\jsonnet.exe -m ..\yaml\ godot.jsonnet
+..\thirdparty\bin\dos2unix ..\yaml\*.yaml

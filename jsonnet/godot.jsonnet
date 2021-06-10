@@ -746,44 +746,14 @@ local godot_gdnative_pipelines =
   [plugin_info.pipeline_name for plugin_info in all_gdnative_plugins];
 
 {
-  // CHIBIFIRE
-  'godot_chibifire_editor.gopipeline.json'
+  'godot_v_sekai_editor.yaml'
   : std.prune(godot_pipeline(
     pipeline_name=godot_template_chibifire_editor,
     godot_status='chibifire',
-    godot_git='https://github.com/godot-extended-libraries/godot-fire.git',
-    godot_branch='extended-fire',
-    gocd_group='chibifire',
-    godot_modules_git='https://github.com/godot-extended-libraries/godot-modules-fire.git',
-    godot_modules_branch='master',
-  )),
-  // STERN FLOWERS
-  'godot_stern_flowers_editor.gopipeline.json'
-  : std.prune(godot_pipeline(
-    pipeline_name=godot_template_stern_flowers_editor,
-    godot_status='stern-flowers',
-    godot_git='https://github.com/godotengine/godot.git',
-    godot_branch='master',
-    gocd_group='stern-flowers'
-  )),
-  // GROUPS
-  'godot_groups_editor.gopipeline.json'
-  : std.prune(godot_pipeline(
-    pipeline_name=godot_template_groups_editor,
-    godot_status='groups',
     godot_git='https://github.com/V-Sekai/godot.git',
-    godot_branch='groups',
-    gocd_group='beta',
+    godot_branch='groups-4.x',
+    gocd_group='chibifire',
     godot_modules_git='https://github.com/V-Sekai/godot-modules-groups.git',
-    godot_modules_branch='groups',
+    godot_modules_branch='groups-modules-4.x',
   )),
-  // 'gdnative_cpp.gopipeline.json'
-  // : std.prune(
-  //   generate_godot_cpp_pipeline(
-  //     pipeline_name=godot_cpp_pipeline,
-  //     pipeline_dependency=godot_template_groups_editor,
-  //     gocd_group='beta',
-  //     godot_status='gdnative.godot-cpp'
-  //   )
-  // ),
 }

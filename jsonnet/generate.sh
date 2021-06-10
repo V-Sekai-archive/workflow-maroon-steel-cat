@@ -1,2 +1,2 @@
-rm ../json/*.yaml
-jsonnet -m ../json/ godot.jsonnet
+rm ../yaml/*.yaml
+jsonnet -m ../yaml/ godot.jsonnet
