@@ -89,4 +89,13 @@ jobs:
         run: |
           argo submit -n argo --log argo-dag.yml
         shell: bash
-
+      - name: Argo submit job
+        run: |
+          sleep 30
+        shell: bash    
+      - name: Argo submit job
+        run: |
+          argo list -n argo
+          argo get -n argo @latest
+          argo logs -n argo @latest
+        shell: bash
