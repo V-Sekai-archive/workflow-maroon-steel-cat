@@ -13,7 +13,7 @@ local platform_info_dict = {
     gdnative_platform: 'windows',
     strip_command: 'mingw-strip --strip-debug',
     // godot_scons_arguments: "use_mingw=yes use_llvm=yes use_lld=yes use_thinlto=yes LINKFLAGS=-Wl,-pdb= CCFLAGS='-g -gcodeview' debug_symbols=no",
-    godot_scons_arguments: "use_mingw=yes use_llvm=yes use_lld=yes use_thinlto=yes",
+    godot_scons_arguments: "use_mingw=yes use_thinlto=yes",
     extra_commands: [],
     environment_variables: [],
     template_artifacts_override: null,
