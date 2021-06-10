@@ -93,13 +93,13 @@ jobs:
         run: |
           sleep 30
         shell: bash    
-      - name: Argo submit job
+      - name: Argo get logs
         run: |
           argo list -n argo
           argo get -n argo @latest
           argo logs -n argo @latest
         shell: bash
-      - name: Get all pod logs
+      - name: Argo get logs try 2
         run: |
           xargs -l kubectl logs < kubectl get pods | grep diamond
         shell: bash
