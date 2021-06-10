@@ -20,7 +20,7 @@ jobs:
         shell: bash
       - name: Create k3d cluster
         run: | 
-          k3d cluster create --agents=3 --volume /tmp/out:/tmp/out
+          k3d cluster create --agents=3 --volume /tmp/out:/tmp/out@agent[0,1,2]
         shell: bash
       - name: Curl get kubectl
         run: |
