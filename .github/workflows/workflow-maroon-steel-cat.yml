@@ -47,10 +47,6 @@ jobs:
         run: |             
           kubectl cluster-info
         shell: bash        
-      - name: Install helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-        shell: bash
       - name: Create argo namespace in k8s
         run: |
           kubectl create ns argo
@@ -87,19 +83,5 @@ jobs:
         shell: bash        
       - name: Argo submit job
         run: |
-          argo submit -n argo argo-dag.yml
-        shell: bash
-      - name: Sleep 30
-        run: |
-          sleep 30
-        shell: bash    
-      - name: Argo get logs
-        run: |
-          argo list -n argo
-          argo get -n argo @latest
-          argo logs -n argo @latest
-        shell: bash
-      - name: Argo get logs via kubernetes
-        run: |
-          kubectl get pod -n argo --no-headers -o custom-columns=":metadata.name" | xargs -0L1 -d '\n' kubectl logs
+          argo submit -n argo ---watch argo-dag.yml
         shell: bash
