@@ -5,4 +5,4 @@ kubectl cluster-info
 kubectl create ns argo
 kubectl apply -n argo --wait=true -f quick-start-postgres.yml
 kubectl rollout status deployment/argo-server -n argo
-..\argo submit -n argo --log argo-artifact.yml
+argo submit -n argo --log argo-artifact.yml
