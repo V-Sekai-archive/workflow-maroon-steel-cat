@@ -20,6 +20,7 @@ jobs:
         shell: bash        
       - name: Image import
         run: |
+          docker pull argoproj/argoexec:latest
           k3d image import argoproj/argoexec:latest
         shell: bash
       - name: Create k3d cluster
