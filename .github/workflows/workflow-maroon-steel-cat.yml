@@ -19,8 +19,8 @@ jobs:
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
         shell: bash
       - name: Create k3d cluster
-        run: |
-          k3d cluster create --agents=3
+        run: | 
+          k3d cluster create --agents=3 --volume /tmp/out:/tmp/out
         shell: bash
       - name: Curl get kubectl
         run: |
@@ -87,4 +87,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: message
-          path: /tmp/out/message
+          path: /tmp/out/message_out
