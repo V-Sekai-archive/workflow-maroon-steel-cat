@@ -10,15 +10,16 @@ spec:
       path: /tmp/out
       type: Directory
   templates:
-  - name: artifact-example
-    steps:
-    - - name: generate-artifact
-        template: whalesay        
-  - name: whalesay
-    container:
-      image: docker/whalesay:latest
-      command: [sh, -c]
-      args: ["cowsay hello world | tee /tmp/out/message_out"]   
-      volumeMounts:
-      - mountPath: /tmp/out
-        name: out
+    - name: whalesay
+      container:
+        image: docker/whalesay:latest
+        command: [sh, -c]
+        args: ["cowsay hello world | tee /tmp/out/message_out"]   
+        volumeMounts:
+        - mountPath: /tmp/out
+          name: out
+    - name: artifact-example
+      dag:
+        tasks:      
+        - name: generate-artifact
+          template: whalesay  
