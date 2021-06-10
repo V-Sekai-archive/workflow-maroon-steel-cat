@@ -18,14 +18,14 @@ jobs:
         run: |
           curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.0.0 bash
         shell: bash        
+      - name: Create k3d cluster
+        run: |
+          k3d cluster create --agents=3
+        shell: bash
       - name: Image import
         run: |
           docker pull argoproj/argoexec:latest
           k3d image import argoproj/argoexec:latest
-        shell: bash
-      - name: Create k3d cluster
-        run: |
-          k3d cluster create --agents=3
         shell: bash
       - name: Curl get kubectl
         run: |
